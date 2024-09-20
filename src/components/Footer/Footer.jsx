@@ -14,8 +14,8 @@ const Footer = () => {
     {/* Logo section*/}    
         <div className="text-2xl flex items-center gap-2
         font-bold uppercase">
-            <p className="text-primary">Rukizi</p>
-                        <p className="text-secondary">Store</p>
+            <p className="text-primary font-averia">Rukizi</p>
+                        <p className="text-secondary font-averia">Store</p>
                         <GiPeanut className="text-green-500" />
 
         </div>
