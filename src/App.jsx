@@ -10,16 +10,6 @@ import Order from './components/Order/Order';
 import Popup from './components/Popup/Popup';
 
 const App = () => {
-  const [showPopup, setShowPopup] = useState(false);
-
-  const handleShowPopup = () => {
-    setShowPopup(true);
-  };
-
-  const handleHidePopup = () => {
-    setShowPopup(false);
-  };
-
   return (
     <Router>
       <Navbar />
@@ -27,15 +17,16 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Hero />} />
           <Route path="/menus" element={<Menus />} />
-          <Route path="/banner" element={<Banner />} /> {/* Example Route */}
-          <Route path="/contacts" element={<Contacts />} /> {/* Example Route */}
-          <Route path="/order" element={<Order onOrderComplete={handleShowPopup} />} /> {/* Example Route */}
+          <Route path="/banner" element={<Banner />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/order" element={<Order />} />
+          <Route path="/verify-order" element={<Popup />} /> {/* Add route for Popup */}
           {/* Add other routes here */}
         </Routes>
-        {showPopup && <Popup onClose={handleHidePopup} />}
         <Footer />
       </main>
     </Router>
   );
 };
+
 export default App;

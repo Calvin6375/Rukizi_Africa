@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-const Popup = ({ onClose }) => {
+const Popup = () => {
+  const navigate = useNavigate(); // Create navigate function
   const [orderNumber, setOrderNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
@@ -21,16 +23,17 @@ const Popup = ({ onClose }) => {
     }
   };
 
+  const handleClose = () => {
+    navigate('/'); // Navigate back to the home page
+  };
+
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose} />
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-6 bg-white rounded-lg shadow-lg z-50">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
-          Close
-        </button>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={handleClose} />
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 bg-white rounded-lg shadow-lg z-50 w-96">
         <form onSubmit={handleSubmit}>
           <label htmlFor="orderNumber" className="block text-gray-700 font-bold mb-2">
-            Enter order number
+            Enter order number (Has been sent to your email)
           </label>
           <input
             type="text"
@@ -55,9 +58,19 @@ const Popup = ({ onClose }) => {
             onChange={(e) => setPhoneNumber(e.target.value)}
             required
           />
-          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-700">
-            Submit
-          </button>
+          <div className="flex justify-between">
+            <button 
+              type="submit" 
+              className="w-1/2 bg-blue-500 text-white py-2 rounded hover:bg-blue-700">
+              Submit
+            </button>
+            <button 
+              type="button" 
+              onClick={handleClose} // This will navigate to the home page
+              className="ml-2 w-1/2 bg-red-500 text-white py-2 rounded hover:bg-red-700">
+              Close
+            </button>
+          </div>
         </form>
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
       </div>
