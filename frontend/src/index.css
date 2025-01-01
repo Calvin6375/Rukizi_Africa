@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .primary-btn {
+        @apply bg-primary text-white
+        font-semibold py-3 px-6 rounded-xl
+        shadow-[0px_10px_14px-7px_#de0029]
+        hover:!scale-110 duration-300;
+    }
+}
+
+@layer utilities {
+    .drop-shadow {
+        filter: drop-shadow(-6px 8px 15px rgba(0, 0, 0, 0.2));
+    }
+}
+/* Define the blink animation */
+@keyframes blink {
+    0% {
+      transform: translateX(0);
+      background-color: transparent;
+    }
+    25% {
+      transform: translateX(-5px);
+      background-color: #ef4444; /* Same as hover effect color */
+    }
+    50% {
+      transform: translateX(5px);
+      background-color: #ef4444;
+    }
+    75% {
+      transform: translateX(-5px);
+      background-color: #ef4444;
+    }
+    100% {
+      transform: translateX(0);
+      background-color: transparent;
+    }
+  }
+  
+  /* Apply the blink effect */
+  .animate-blink {
+    animation: blink 0.3s ease-out 10; /* Repeat 10 times with 0.3s duration */
+  }
+  
+  /* Hover effect */
+  button:hover {
+    background-color: #ef4444;
+    color: white;
+    transform: scale(1.1);
+  }
+  
