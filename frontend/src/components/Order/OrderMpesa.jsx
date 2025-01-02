@@ -39,7 +39,7 @@ const OrderMpesa = () => {
       console.log('Email sent successfully');
 
       // Send payment initiation request to the backend
-      const response = await fetch('https://6d6a-102-214-76-34.ngrok-free.app/api/payments/mpesa', { // Updated endpoint
+      const response = await fetch('https://rukizi-backend.onrender.com/api/payments/mpesa', { // Updated endpoint
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

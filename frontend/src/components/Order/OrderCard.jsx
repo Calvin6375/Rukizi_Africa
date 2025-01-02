@@ -52,7 +52,7 @@ const OrderCard = () => {
       console.log('Email sent successfully');
 
       // Send the data to the backend to generate a checkout link
-      const response = await axios.post('http://localhost:5000/api/payments/bank', {
+      const response = await axios.post('https://rukizi-backend.onrender.com/api/payments/bank', {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email, // Use the email entered by the user
@@ -60,7 +60,7 @@ const OrderCard = () => {
         amount: formData.amount,
         currency: formData.currency,
         method: 'CARD-PAYMENT', // Specify that we want to accept only card payments
-        redirect_url: 'http://localhost:5173/payment/card' // Replace with your actual redirect URL
+        redirect_url: 'https://rukizi-africa.onrender.com/payment/card' // Replace with your actual redirect URL
       });
 
       // Redirect the user to the checkout link

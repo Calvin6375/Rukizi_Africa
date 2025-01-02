@@ -3,11 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Initialize IntaSend with your keys
+// Initialize IntaSend with your keys and environment
 const intasend = new IntaSend(
     process.env.INSTASEND_PUBLISHABLE_KEY,  // Your publishable key
     process.env.INSTASEND_SECRET_KEY,       // Your secret key
-    true // Set to true for test environment
+    process.env.INSTASEND_TEST === 'true'   // Set to true for sandbox, false for live
 );
 
 export const initiateMpesaStkPush = async (req, res) => {
@@ -18,6 +18,11 @@ export const initiateMpesaStkPush = async (req, res) => {
         // Create a collection instance
         let collection = intasend.collection();
 
+        // Determine the correct API base URL (sandbox or live)
+        const apiBaseUrl = process.env.INSTASEND_TEST === 'true'
+            ? process.env.MPESA_API_URL_SANDBOX
+            : process.env.MPESA_API_URL_LIVE;
+
         // Trigger the M-Pesa STK Push
         const response = await collection.mpesaStkPush({
             first_name: firstName,
@@ -25,8 +30,8 @@ export const initiateMpesaStkPush = async (req, res) => {
             email: email,
             phone_number: phoneNumber,
             amount: totalAmount,
-            api_ref: 'test',  // Reference for the transaction, could be order ID or unique value
-            host: 'https://6d6a-102-214-76-34.ngrok-free.app',  // Your website or callback URL for the user to complete the payment
+            api_ref: `order-${Date.now()}`,  // Generate a unique reference using timestamp
+            host: apiBaseUrl,  // Dynamically use the appropriate base URL for the environment
         });
 
         console.log('InstaSend response:', response); // Log response from InstaSend API

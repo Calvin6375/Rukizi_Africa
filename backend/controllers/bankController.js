@@ -1,10 +1,10 @@
 import IntaSend from 'intasend-node'; // Import the IntaSend SDK
 
-// Initialize IntaSend with your keys
+// Initialize IntaSend with your production keys
 const intasend = new IntaSend(
     process.env.INSTASEND_PUBLISHABLE_KEY, // Your publishable key
     process.env.INSTASEND_SECRET_KEY, // Your secret key
-    true // Set to true for test environment
+    false // Set to false for production environment (true for test environment)
 );
 
 // Example logic for bank payment initiation
