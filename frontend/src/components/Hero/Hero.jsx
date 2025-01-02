@@ -14,7 +14,7 @@ const Hero = () => {
 
   const handleDownloadClick = () => {
     const link = document.createElement('a');
-    link.href = `${process.env.PUBLIC_URL}/app.apk`; // This will resolve to /app.apk
+    link.href = `${process.env.PUBLIC_URL}/assets/app-C2hQf127.apk`; // Update the path here
     link.setAttribute('download', 'app.apk');
     document.body.appendChild(link);
     link.click();
