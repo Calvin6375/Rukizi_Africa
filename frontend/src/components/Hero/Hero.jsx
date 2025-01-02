@@ -13,10 +13,9 @@ const Hero = () => {
   };
 
   const handleDownloadClick = () => {
-    // Trigger download of the APK file
     const link = document.createElement('a');
-    link.href = '/dist/app.apk'; // Adjust the path if necessary
-    link.setAttribute('download', 'app.apk'); // Set the name for the downloaded file
+    link.href = `${process.env.PUBLIC_URL}/app.apk`; // This will resolve to /app.apk
+    link.setAttribute('download', 'app.apk');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
