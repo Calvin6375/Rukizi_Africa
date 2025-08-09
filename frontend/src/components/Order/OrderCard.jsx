@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom'; // Import useLocation to access passed state
+import { useLocation } from 'react-router-dom';
 
 const OrderCard = () => {
-  const location = useLocation(); // Get the location object
-  const { total, currency } = location.state || { total: 0, currency: 'KES' }; // Get the total and currency from the state passed from the Cart component
+  const location = useLocation();
+  const { total, currency } = location.state || { total: 0, currency: 'KES' };
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
     email: '',
-    amount: total, // Set the amount to the total passed from the Cart
-    currency: currency, // Set the currency
+    amount: total,
+    currency: currency,
   });
 
   const [loading, setLoading] = useState(false);
@@ -21,10 +21,10 @@ const OrderCard = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -35,42 +35,73 @@ const OrderCard = () => {
       lastName: formData.lastName,
       phoneNumber: formData.phoneNumber,
       email: formData.email,
-      to_name: `${formData.firstName} ${formData.lastName}`
+      to_name: `${formData.firstName} ${formData.lastName}`,
     };
 
     setLoading(true);
     setErrorMessage('');
 
     try {
+      // Log EmailJS environment variables
+      console.log('EmailJS Service ID:', import.meta.env.VITE_EMAILJS_SERVICE_ID);
+      console.log('EmailJS Template ID:', import.meta.env.VITE_EMAILJS_TEMPLATE_ID);
+      console.log('EmailJS User ID:', import.meta.env.VITE_EMAILJS_USER_ID);
+      console.log('Sending email with params:', emailParams);
+
       // Send email using EmailJS
       await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID, // Use the environment variable
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID, // Use the environment variable
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         emailParams,
-        import.meta.env.VITE_EMAILJS_USER_ID // Use the environment variable
+        import.meta.env.VITE_EMAILJS_USER_ID
       );
       console.log('Email sent successfully');
 
-      // Send the data to the backend to generate a checkout link
-      const response = await axios.post('https://rukizi-backend.onrender.com/api/payments/bank', {
+      // Send the payment initiation request to backend
+      console.log('Sending payment initiation request to backend with data:', {
         first_name: formData.firstName,
         last_name: formData.lastName,
-        email: formData.email, // Use the email entered by the user
+        email: formData.email,
         phone_number: formData.phoneNumber,
         amount: formData.amount,
         currency: formData.currency,
-        method: 'CARD-PAYMENT', // Specify that we want to accept only card payments
-        redirect_url: 'https://rukizi-africa.onrender.com/payment/card' // Replace with your actual redirect URL
+        method: 'CARD-PAYMENT',
+        redirect_url: 'https://rukizi-africa.onrender.com/payment/card',
       });
 
-      // Redirect the user to the checkout link
-      window.location.href = response.data.url;
+      const response = await axios.post('https://rukizi-backend.onrender.com/api/payments/bank', {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone_number: formData.phoneNumber,
+        amount: formData.amount,
+        currency: formData.currency,
+        method: 'CARD-PAYMENT',
+        redirect_url: 'https://rukizi-africa.onrender.com/payment/card',
+      });
 
-      setLoading(false);
+      console.log('Payment initiation response from backend:', response.data);
+
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        setErrorMessage('No checkout URL received from backend.');
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
-      console.error('Failed to send email or generate checkout link:', error.message);
-      setErrorMessage('Failed to send payment details. Please try again.');
+      if (error.response) {
+        // Backend or EmailJS response with error info
+        console.error('Error response data:', error.response.data);
+        setErrorMessage(error.response.data.message || 'An error occurred.');
+      } else if (error.text) {
+        // EmailJS error text
+        console.error('EmailJS error text:', error.text);
+        setErrorMessage('EmailJS error: ' + error.text);
+      } else {
+        console.error('Error message:', error.message || error);
+        setErrorMessage('Failed to send payment details. Please try again.');
+      }
     }
   };
 
@@ -146,7 +177,7 @@ const OrderCard = () => {
               id="amount"
               name="amount"
               value={formData.amount}
-              className="mt-2 p-2 border rounded-md w-full bg-gray-200" // Make it read-only with a different background
+              className="mt-2 p-2 border rounded-md w-full bg-gray-200"
               readOnly
             />
           </div>
@@ -159,13 +190,11 @@ const OrderCard = () => {
               id="currency"
               name="currency"
               value={formData.currency}
-              className="mt-2 p-2 border rounded-md w-full bg-gray-200" // Make it read-only with a different background
+              className="mt-2 p-2 border rounded-md w-full bg-gray-200"
               readOnly
             />
           </div>
-          {errorMessage && (
-            <p className="text-red-500 mb-4">{errorMessage}</p>
-          )}
+          {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
