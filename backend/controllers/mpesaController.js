@@ -47,3 +47,15 @@ export const initiateMpesaStkPush = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+export const mpesaCallbackHandler = (req, res) => {
+  // IntaSend will POST payment result here
+  console.log('M-Pesa Callback received:', req.body);
+
+  // You can verify and update your database with payment status here
+  // Example:
+  // const { status, api_ref, amount, phone_number } = req.body;
+
+  // Respond with 200 OK to acknowledge receipt
+  res.status(200).json({ message: 'M-Pesa callback received' });
+};

@@ -23,7 +23,7 @@ export const initiateBankPayment = async (req, res) => {
             currency,
             redirect_url,
             host: 'https://yourwebsite.com', // Replace with your actual host
-            api_ref: 'test', // Optional reference for your transaction
+            api_ref: 'patment_1', // Optional reference for your transaction
             method: 'CARD-PAYMENT' // Specify the payment method
         };
 
@@ -42,4 +42,14 @@ export const initiateBankPayment = async (req, res) => {
         console.error('Error initiating bank payment:', error.message);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
+};
+
+
+export const bankCallbackHandler = (req, res) => {
+  // IntaSend will POST bank payment result here
+  console.log('Bank Payment Callback received:', req.body);
+
+  // Handle updating database/order/payment status here
+
+  res.status(200).json({ message: 'Bank callback received' });
 };

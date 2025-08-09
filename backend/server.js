@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 // Use the routes
 app.use('/api/payments', mpesaRoutes);
-app.use('/api/payments/bank', bankRoutes); // This should match the route you are testing
+app.use('/api/payments/bank', bankRoutes); 
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
