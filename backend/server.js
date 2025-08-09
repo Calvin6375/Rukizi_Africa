@@ -17,6 +17,11 @@ app.use(bodyParser.json());
 app.use('/api/payments', mpesaRoutes);
 app.use('/api/payments/bank', bankRoutes); 
 
+// Add root route before app.listen
+app.get('/', (req, res) => {
+  res.send('Backend is running');
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

@@ -3,59 +3,59 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Initialize IntaSend with your keys and environment
 const intasend = new IntaSend(
-    process.env.INSTASEND_PUBLISHABLE_KEY,  // Your publishable key
-    process.env.INSTASEND_SECRET_KEY,       // Your secret key
-    process.env.INSTASEND_TEST === 'true'   // Set to true for sandbox, false for live
+    process.env.INTASEND_PUBLISHABLE_KEY,
+    process.env.INTASEND_SECRET_KEY,
+    process.env.INTASEND_TEST === 'true'
 );
 
 export const initiateMpesaStkPush = async (req, res) => {
     const { firstName, lastName, email, phoneNumber, totalAmount } = req.body;
-    console.log('Received request:', req.body); // Log incoming request
+    console.log('===== M-Pesa STK Push Request Received =====');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
 
     try {
-        // Create a collection instance
         let collection = intasend.collection();
 
-        // Determine the correct API base URL (sandbox or live)
-        const apiBaseUrl = process.env.INSTASEND_TEST === 'true'
+        const apiBaseUrl = process.env.INTASEND_TEST === 'true'
             ? process.env.MPESA_API_URL_SANDBOX
             : process.env.MPESA_API_URL_LIVE;
 
-        // Trigger the M-Pesa STK Push
         const response = await collection.mpesaStkPush({
             first_name: firstName,
             last_name: lastName,
             email: email,
             phone_number: phoneNumber,
             amount: totalAmount,
-            api_ref: `order-${Date.now()}`,  // Generate a unique reference using timestamp
-            host: apiBaseUrl,  // Dynamically use the appropriate base URL for the environment
+            api_ref: `order-${Date.now()}`,
+            host: apiBaseUrl,
+            callback_url: process.env.MPESA_CALLBACK_URL,
         });
 
-        console.log('InstaSend response:', response); // Log response from InstaSend API
+        console.log('===== IntaSend M-Pesa STK Push Response =====');
+        console.log(JSON.stringify(response, null, 2));
 
-        // Handle the response from InstaSend API
         if (response.status === 'success') {
             res.status(200).json({ message: 'M-Pesa STK Push initiated successfully', data: response });
         } else {
+            console.log('M-Pesa STK Push initiation failed:', JSON.stringify(response, null, 2));
             res.status(400).json({ message: 'M-Pesa STK Push initiation failed', error: response });
         }
     } catch (error) {
-        console.error('Error initiating M-Pesa STK Push:', error.response ? error.response.data : error.message);
+        if (error.response) {
+            console.error('Error response from IntaSend API:', JSON.stringify(error.response.data, null, 2));
+        } else {
+            console.error('Error initiating M-Pesa STK Push:', error.message);
+        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 export const mpesaCallbackHandler = (req, res) => {
-  // IntaSend will POST payment result here
-  console.log('M-Pesa Callback received:', req.body);
+    console.log('===== M-Pesa Callback Received =====');
+    console.log('Callback body:', JSON.stringify(req.body, null, 2));
 
-  // You can verify and update your database with payment status here
-  // Example:
-  // const { status, api_ref, amount, phone_number } = req.body;
+    // TODO: validate & process callback data here
 
-  // Respond with 200 OK to acknowledge receipt
-  res.status(200).json({ message: 'M-Pesa callback received' });
+    res.status(200).json({ message: 'M-Pesa callback received' });
 };

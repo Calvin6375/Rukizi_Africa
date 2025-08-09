@@ -1,55 +1,63 @@
-import IntaSend from 'intasend-node'; // Import the IntaSend SDK
+import IntaSend from 'intasend-node';
+import dotenv from 'dotenv';
 
-// Initialize IntaSend with your production keys
+dotenv.config();
+
 const intasend = new IntaSend(
-    process.env.INSTASEND_PUBLISHABLE_KEY, // Your publishable key
-    process.env.INSTASEND_SECRET_KEY, // Your secret key
-    false // Set to false for production environment (true for test environment)
+    process.env.INTASEND_PUBLISHABLE_KEY,
+    process.env.INTASEND_SECRET_KEY,
+    process.env.INTASEND_TEST === 'true'  // Use env var to toggle test/live
 );
 
-// Example logic for bank payment initiation
 export const initiateBankPayment = async (req, res) => {
+    console.log('===== Bank Payment Request Received =====');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+
     const { first_name, last_name, email, phone_number, amount, currency, redirect_url } = req.body;
-    console.log('Received bank payment request:', req.body);
 
     try {
-        // Prepare the payload for the IntaSend API
+        const apiBaseUrl = process.env.INTASEND_TEST === 'true'
+            ? process.env.MPESA_API_URL_SANDBOX
+            : process.env.MPESA_API_URL_LIVE;
+
         const payload = {
             first_name,
             last_name,
             email,
             phone_number,
-            amount: amount.toString(), // Ensure amount is a string
+            amount: amount.toString(),
             currency,
             redirect_url,
-            host: 'https://yourwebsite.com', // Replace with your actual host
-            api_ref: 'patment_1', // Optional reference for your transaction
-            method: 'CARD-PAYMENT' // Specify the payment method
+            host: apiBaseUrl,                     // Use the correct host based on env
+            api_ref: `payment_${Date.now()}`,    // Unique transaction reference
+            method: 'CARD-PAYMENT',               // Payment method (you can customize)
+            callback_url: process.env.BANK_CALLBACK_URL,  // Add callback URL here
         };
 
-        // Log the payload for debugging
-        console.log('Payload:', payload);
+        console.log('Payload for IntaSend charge:', JSON.stringify(payload, null, 2));
 
-        // Call the IntaSend API to create a checkout link
         const response = await intasend.collection().charge(payload);
 
-        // Log the response from the IntaSend API
-        console.log('Charge Response:', response);
+        console.log('===== IntaSend Bank Payment Charge Response =====');
+        console.log(JSON.stringify(response, null, 2));
 
-        // Return the checkout URL to the frontend
-        res.status(200).json({ url: response.url }); // Adjust based on the actual response structure
+        // Return the checkout URL or full response based on SDK
+        res.status(200).json({ url: response.url || response.checkout_url || null, data: response });
     } catch (error) {
-        console.error('Error initiating bank payment:', error.message);
+        if (error.response) {
+            console.error('Error response from IntaSend API:', JSON.stringify(error.response.data, null, 2));
+        } else {
+            console.error('Error initiating bank payment:', error.message);
+        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-
 export const bankCallbackHandler = (req, res) => {
-  // IntaSend will POST bank payment result here
-  console.log('Bank Payment Callback received:', req.body);
+    console.log('===== Bank Payment Callback Received =====');
+    console.log('Callback body:', JSON.stringify(req.body, null, 2));
 
-  // Handle updating database/order/payment status here
+    // TODO: validate & process callback data here (update DB/orders/payment status)
 
-  res.status(200).json({ message: 'Bank callback received' });
+    res.status(200).json({ message: 'Bank callback received' });
 };

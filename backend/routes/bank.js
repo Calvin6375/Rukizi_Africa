@@ -1,9 +1,12 @@
 import express from 'express';
-import { initiateBankPayment } from '../controllers/bankController.js';
+import { initiateBankPayment, bankCallbackHandler } from '../controllers/bankController.js';
 
 const router = express.Router();
 
-// This route will handle POST requests to /api/payments/bank
-router.post('/', initiateBankPayment); // Change to '/' to match the base route
+// POST /api/payments/bank to initiate bank payment
+router.post('/', initiateBankPayment);
+
+// POST /api/payments/bank/callback to handle payment callbacks from IntaSend
+router.post('/callback', bankCallbackHandler);
 
 export default router;
