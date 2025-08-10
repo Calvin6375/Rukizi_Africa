@@ -51,25 +51,31 @@ export const initiateMpesaStkPush = async (req, res) => {
             });
         }
 
-    } catch (error) {
-        console.error('===== Error initiating M-Pesa STK Push =====');
+   } catch (error) {
+    console.error('===== Error initiating M-Pesa STK Push =====');
 
-        // Full raw error logging
-        if (error.response) {
-            console.error('Status:', error.response.status);
-            console.error('Headers:', JSON.stringify(error.response.headers, null, 2));
-            console.error('Body:', JSON.stringify(error.response.data, null, 2));
-        } else if (error.body) {
-            console.error('Error body:', JSON.stringify(error.body, null, 2));
-        } else {
-            console.error('Error message:', error.message);
-        }
+    // Log the raw error object for debugging
+    console.dir(error, { depth: null, colors: true });
 
-        res.status(500).json({
-            message: 'Server error',
-            error: error.response?.data || error.message
-        });
+    if (error.response) {
+        console.error('Status:', error.response.status);
+        console.error('Headers:', JSON.stringify(error.response.headers, null, 2));
+
+        // Log raw body (works for most HTTP libraries)
+        const data = error.response.data || error.response.body;
+        console.error('Body:', JSON.stringify(data, null, 2));
+    } else if (error.body) {
+        console.error('Error body:', JSON.stringify(error.body, null, 2));
+    } else {
+        console.error('Error message:', error.message);
     }
+
+    res.status(500).json({
+        message: 'Server error',
+        error: error.response?.data || error.response?.body || error.message
+    });
+}
+
 };
 
 export const mpesaCallbackHandler = (req, res) => {
