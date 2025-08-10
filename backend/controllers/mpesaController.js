@@ -10,7 +10,7 @@ const intasend = new IntaSend(
 );
 
 export const initiateMpesaStkPush = async (req, res) => {
-    const { phone_umber, amount } = req.body;  // 'phoneNumber' from the request
+    const { phone_number, amount } = req.body;  // 'phoneNumber' from the request
 
     console.log('===== M-Pesa STK Push Request Received =====');
     console.log('Request headers:', JSON.stringify(req.headers, null, 2));
@@ -30,7 +30,7 @@ export const initiateMpesaStkPush = async (req, res) => {
 
         const response = await collection.mpesaStkPush({
             amount: amount.toString(),
-            phone_number: phoneNumber.toString(), // must be snake_case for IntaSend API
+            phone_number: phone_number.toString(), // must be snake_case for IntaSend API
             host: apiBaseUrl,
             callback_url: process.env.MPESA_CALLBACK_URL,
         });
