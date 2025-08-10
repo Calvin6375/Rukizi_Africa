@@ -30,7 +30,7 @@ export const initiateMpesaStkPush = async (req, res) => {
 
         const response = await collection.mpesaStkPush({
             amount: amount.toString(),
-            phone_number: phoneNumber, // must be snake_case for IntaSend API
+            phone_number: phoneNumber.toString(), // must be snake_case for IntaSend API
             host: apiBaseUrl,
             callback_url: process.env.MPESA_CALLBACK_URL,
         });
