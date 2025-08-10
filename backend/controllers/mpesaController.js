@@ -10,7 +10,7 @@ const intasend = new IntaSend(
 );
 
 export const initiateMpesaStkPush = async (req, res) => {
-    const { phoneNumber, totalAmount } = req.body;
+    const { phoneNumber, amount } = req.body;  // <- use 'amount' here, not totalAmount
 
     console.log('===== M-Pesa STK Push Request Received =====');
     console.log('Request headers:', JSON.stringify(req.headers, null, 2));
@@ -26,19 +26,15 @@ export const initiateMpesaStkPush = async (req, res) => {
         console.log('Sending request to base URL:', apiBaseUrl);
 
         const response = await collection.mpesaStkPush({
-            amount: totalAmount.toString(),
+            amount: amount.toString(),
             phone_number: phoneNumber,
             host: apiBaseUrl,
             callback_url: process.env.MPESA_CALLBACK_URL,
         });
 
-        // Log the entire raw response object (including any nested properties)
         console.log('===== Raw response from IntaSend API =====');
         console.dir(response, { depth: null, colors: true });
 
-        // If the SDK returns any raw HTTP response headers or status,
-        // log them here if available (this depends on SDK implementation).
-        // For example, if response.raw or response.headers exists:
         if (response.raw) {
             console.log('Raw HTTP response:', response.raw);
         }
