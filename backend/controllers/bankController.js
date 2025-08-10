@@ -11,6 +11,7 @@ const intasend = new IntaSend(
 
 export const initiateBankPayment = async (req, res) => {
     console.log('===== Bank Payment Request Received =====');
+    console.log('Request headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request body:', JSON.stringify(req.body, null, 2));
 
     const { first_name, last_name, email, phone_number, amount, currency, redirect_url } = req.body;
@@ -19,6 +20,8 @@ export const initiateBankPayment = async (req, res) => {
         const apiBaseUrl = process.env.INTASEND_TEST === 'true'
             ? process.env.MPESA_API_URL_SANDBOX
             : process.env.MPESA_API_URL_LIVE;
+
+        console.log('Sending request to base URL:', apiBaseUrl);
 
         const payload = {
             first_name,
@@ -55,6 +58,7 @@ export const initiateBankPayment = async (req, res) => {
 
 export const bankCallbackHandler = (req, res) => {
     console.log('===== Bank Payment Callback Received =====');
+    console.log('Callback headers:', JSON.stringify(req.headers, null, 2));
     console.log('Callback body:', JSON.stringify(req.body, null, 2));
 
     // TODO: validate & process callback data here (update DB/orders/payment status)

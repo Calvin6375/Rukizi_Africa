@@ -11,7 +11,9 @@ const intasend = new IntaSend(
 
 export const initiateMpesaStkPush = async (req, res) => {
     const { firstName, lastName, email, phoneNumber, totalAmount } = req.body;
+    
     console.log('===== M-Pesa STK Push Request Received =====');
+    console.log('Request headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request body:', JSON.stringify(req.body, null, 2));
 
     try {
@@ -21,12 +23,14 @@ export const initiateMpesaStkPush = async (req, res) => {
             ? process.env.MPESA_API_URL_SANDBOX
             : process.env.MPESA_API_URL_LIVE;
 
+        console.log('Sending request to base URL:', apiBaseUrl);
+
         const response = await collection.mpesaStkPush({
             first_name: firstName,
             last_name: lastName,
             email: email,
             phone_number: phoneNumber,
-            amount: totalAmount,
+            amount: totalAmount,   // corrected to totalAmount
             api_ref: `order-${Date.now()}`,
             host: apiBaseUrl,
             callback_url: process.env.MPESA_CALLBACK_URL,
@@ -53,6 +57,7 @@ export const initiateMpesaStkPush = async (req, res) => {
 
 export const mpesaCallbackHandler = (req, res) => {
     console.log('===== M-Pesa Callback Received =====');
+    console.log('Callback headers:', JSON.stringify(req.headers, null, 2));
     console.log('Callback body:', JSON.stringify(req.body, null, 2));
 
     // TODO: validate & process callback data here
