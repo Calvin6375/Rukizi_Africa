@@ -10,8 +10,8 @@ const intasend = new IntaSend(
 );
 
 export const initiateMpesaStkPush = async (req, res) => {
-    const { firstName, lastName, email, phoneNumber, amount } = req.body;
-    
+    const { phoneNumber, totalAmount } = req.body;
+
     console.log('===== M-Pesa STK Push Request Received =====');
     console.log('Request headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request body:', JSON.stringify(req.body, null, 2));
@@ -26,18 +26,25 @@ export const initiateMpesaStkPush = async (req, res) => {
         console.log('Sending request to base URL:', apiBaseUrl);
 
         const response = await collection.mpesaStkPush({
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
+            amount: totalAmount.toString(),
             phone_number: phoneNumber,
-            amount: amount,   // corrected to totalAmount
-            api_ref: `order-${Date.now()}`,
             host: apiBaseUrl,
             callback_url: process.env.MPESA_CALLBACK_URL,
         });
 
-        console.log('===== IntaSend M-Pesa STK Push Response =====');
-        console.log(JSON.stringify(response, null, 2));
+        // Log the entire raw response object (including any nested properties)
+        console.log('===== Raw response from IntaSend API =====');
+        console.dir(response, { depth: null, colors: true });
+
+        // If the SDK returns any raw HTTP response headers or status,
+        // log them here if available (this depends on SDK implementation).
+        // For example, if response.raw or response.headers exists:
+        if (response.raw) {
+            console.log('Raw HTTP response:', response.raw);
+        }
+        if (response.headers) {
+            console.log('Response headers:', JSON.stringify(response.headers, null, 2));
+        }
 
         if (response.status === 'success') {
             res.status(200).json({ message: 'M-Pesa STK Push initiated successfully', data: response });
@@ -48,6 +55,7 @@ export const initiateMpesaStkPush = async (req, res) => {
     } catch (error) {
         if (error.response) {
             console.error('Error response from IntaSend API:', JSON.stringify(error.response.data, null, 2));
+            console.error('Error response headers:', JSON.stringify(error.response.headers, null, 2));
         } else {
             console.error('Error initiating M-Pesa STK Push:', error.message);
         }
