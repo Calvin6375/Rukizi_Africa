@@ -8,13 +8,14 @@ const intasend = new IntaSend(
     process.env.INTASEND_SECRET_KEY,
     process.env.INTASEND_TEST === 'true'
 );
-
+    
 export const initiateMpesaStkPush = async (req, res) => {
     const { phoneNumber, amount } = req.body;  // 'phoneNumber' from the request
 
     console.log('===== M-Pesa STK Push Request Received =====');
     console.log('Request headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
 
     try {
         let collection = intasend.collection();
@@ -24,7 +25,10 @@ export const initiateMpesaStkPush = async (req, res) => {
             : process.env.MPESA_API_URL_LIVE;
 
         console.log('Sending request to base URL:', apiBaseUrl);
-
+        console.log('process.env.INTASEND_PUBLISHABLE_KEY:', process.env.INTASEND_PUBLISHABLE_KEY);
+        console.log('process.env.INTASEND_SECRET_KEY:', process.env.INTASEND_SECRET_KEY);
+        console.log('process.env.INTASEND_TEST:', process.env.INTASEND_TEST);   
+        
         // Use phone_number correctly (not phone_number which was undefined)
         const response = await collection.mpesaStkPush({
             amount: amount.toString(),
