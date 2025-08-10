@@ -24,9 +24,7 @@ export const initiateMpesaStkPush = async (req, res) => {
             : process.env.MPESA_API_URL_LIVE;
 
         console.log('Sending request to base URL:', apiBaseUrl);
-        console.log('process.env.INTASEND_PUBLISHABLE_KEY:', process.env.INTASEND_PUBLISHABLE_KEY);
-        console.log('process.env.INTASEND_SECRET_KEY:', process.env.INTASEND_SECRET_KEY);
-        console.log('process.env.INTASEND_TEST:', process.env.INTASEND_TEST);
+        
 
         const response = await collection.mpesaStkPush({
             amount: amount.toString(),
