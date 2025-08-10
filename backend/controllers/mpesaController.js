@@ -8,14 +8,13 @@ const intasend = new IntaSend(
     process.env.INTASEND_SECRET_KEY,
     process.env.INTASEND_TEST === 'true'
 );
-    
+
 export const initiateMpesaStkPush = async (req, res) => {
     const { phoneNumber, amount } = req.body;  // 'phoneNumber' from the request
 
     console.log('===== M-Pesa STK Push Request Received =====');
     console.log('Request headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request body:', JSON.stringify(req.body, null, 2));
-    
 
     try {
         let collection = intasend.collection();
@@ -27,12 +26,11 @@ export const initiateMpesaStkPush = async (req, res) => {
         console.log('Sending request to base URL:', apiBaseUrl);
         console.log('process.env.INTASEND_PUBLISHABLE_KEY:', process.env.INTASEND_PUBLISHABLE_KEY);
         console.log('process.env.INTASEND_SECRET_KEY:', process.env.INTASEND_SECRET_KEY);
-        console.log('process.env.INTASEND_TEST:', process.env.INTASEND_TEST);   
-        
-        // Use phone_number correctly (not phone_number which was undefined)
+        console.log('process.env.INTASEND_TEST:', process.env.INTASEND_TEST);
+
         const response = await collection.mpesaStkPush({
             amount: amount.toString(),
-            phone_number: phoneNumber,   // FIXED HERE
+            phone_number: phoneNumber, // must be snake_case for IntaSend API
             host: apiBaseUrl,
             callback_url: process.env.MPESA_CALLBACK_URL,
         });
@@ -40,27 +38,37 @@ export const initiateMpesaStkPush = async (req, res) => {
         console.log('===== Raw response from IntaSend API =====');
         console.dir(response, { depth: null, colors: true });
 
-        if (response.raw) {
-            console.log('Raw HTTP response:', response.raw);
-        }
-        if (response.headers) {
-            console.log('Response headers:', JSON.stringify(response.headers, null, 2));
-        }
-
         if (response.status === 'success') {
-            res.status(200).json({ message: 'M-Pesa STK Push initiated successfully', data: response });
+            res.status(200).json({
+                message: 'M-Pesa STK Push initiated successfully',
+                data: response
+            });
         } else {
             console.log('M-Pesa STK Push initiation failed:', JSON.stringify(response, null, 2));
-            res.status(400).json({ message: 'M-Pesa STK Push initiation failed', error: response });
+            res.status(400).json({
+                message: 'M-Pesa STK Push initiation failed',
+                error: response
+            });
         }
+
     } catch (error) {
+        console.error('===== Error initiating M-Pesa STK Push =====');
+
+        // Full raw error logging
         if (error.response) {
-            console.error('Error response from IntaSend API:', JSON.stringify(error.response.data, null, 2));
-            console.error('Error response headers:', JSON.stringify(error.response.headers, null, 2));
+            console.error('Status:', error.response.status);
+            console.error('Headers:', JSON.stringify(error.response.headers, null, 2));
+            console.error('Body:', JSON.stringify(error.response.data, null, 2));
+        } else if (error.body) {
+            console.error('Error body:', JSON.stringify(error.body, null, 2));
         } else {
-            console.error('Error initiating M-Pesa STK Push:', error.message);
+            console.error('Error message:', error.message);
         }
-        res.status(500).json({ message: 'Server error', error: error.message });
+
+        res.status(500).json({
+            message: 'Server error',
+            error: error.response?.data || error.message
+        });
     }
 };
 
@@ -68,8 +76,6 @@ export const mpesaCallbackHandler = (req, res) => {
     console.log('===== M-Pesa Callback Received =====');
     console.log('Callback headers:', JSON.stringify(req.headers, null, 2));
     console.log('Callback body:', JSON.stringify(req.body, null, 2));
-
-    // TODO: validate & process callback data here
 
     res.status(200).json({ message: 'M-Pesa callback received' });
 };
