@@ -6,7 +6,7 @@ const OrderMpesa = () => {
   const { state } = useLocation(); // Get state from navigate
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phone_number, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -19,7 +19,7 @@ const OrderMpesa = () => {
     const templateParams = {
       firstName,
       lastName,
-      phoneNumber,
+      phone_number,
       email,
       to_name: `${firstName} ${lastName}`,
     };
@@ -47,13 +47,13 @@ const OrderMpesa = () => {
         body: JSON.stringify({
           firstName,
           lastName,
-          phoneNumber,
+          phone_number,
           email,
           amount: total // Ensure this matches the backend expected field
         })
       });
       console.log('Payment initiation request sent to backend');
-      
+
 
       // Check if the response is ok
       if (!response.ok) {
