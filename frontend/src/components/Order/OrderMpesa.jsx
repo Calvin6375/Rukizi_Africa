@@ -39,7 +39,7 @@ const OrderMpesa = () => {
       console.log('Email sent successfully');
 
       // Send payment initiation request to the backend
-      const response = await fetch('https://rukizi-backend.onrender.com/api/payments/mpesa', { // Updated endpoint
+      const response = await fetch('https://rukizi-backend.onrender.com/api/payments/mpesa', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -49,9 +49,11 @@ const OrderMpesa = () => {
           lastName,
           phoneNumber,
           email,
-          totalAmount: total // Ensure this matches the backend expected field
+          amount: total // Ensure this matches the backend expected field
         })
       });
+      console.log('Payment initiation request sent to backend');
+      
 
       // Check if the response is ok
       if (!response.ok) {
